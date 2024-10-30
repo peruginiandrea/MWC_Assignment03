@@ -2,6 +2,7 @@ package com.example.stepappv4.ui.Report;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 
 import androidx.annotation.ColorLong;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -62,7 +64,7 @@ public class ReportFragment extends Fragment {
         Cartesian cartesian = createColumnChart();
         anyChartView.setBackgroundColor("#00000000");
         anyChartView.setChart(cartesian);
-
+//
 
         return root;
     }
@@ -77,12 +79,18 @@ public class ReportFragment extends Fragment {
         //***** Read data from SQLiteDatabase *********/
         // TODO 1 (YOUR TURN): Get the map with hours and number of steps for today
         //  from the database and assign it to variable stepsByHour
+        stepsByHour = StepAppOpenHelper.loadStepsByHour(getContext(), current_time);
 
         // TODO 2 (YOUR TURN): Creating a new map that contains hours of the day from 0 to 23 and
         //  number of steps during each hour set to 0
+        Map<Integer, Integer> graph_map = new TreeMap<>();
+        for (int i = 0; i < 24; i++) {
+            graph_map.put(i, 0);
+        }
 
         // TODO 3 (YOUR TURN): Replace the number of steps for each hour in graph_map
         //  with the number of steps read from the database
+        graph_map.putAll(stepsByHour);
 
 
         //***** Create column chart using AnyChart library *********/
@@ -100,6 +108,8 @@ public class ReportFragment extends Fragment {
 
         //***** Modify the UI of the chart *********/
        // TODO 7 (YOUR TURN): Change the color of column chart and its border
+        column.fill(String.valueOf(androidx.appcompat.R.attr.colorPrimary));
+        column.stroke(String.valueOf(com.google.android.material.R.attr.colorPrimary));
 
 
 
@@ -110,6 +120,7 @@ public class ReportFragment extends Fragment {
                 .anchor(Anchor.RIGHT_BOTTOM);
 
         // TODO 9 (YOUR TURN): Modify column chart tooltip properties
+        column.tooltip().anchor(Anchor.RIGHT_TOP).offsetX(0d).offsetY(5);
 
 
         // Modifying properties of cartesian
@@ -119,8 +130,13 @@ public class ReportFragment extends Fragment {
 
 
         // TODO 10 (YOUR TURN): Modify the UI of the cartesian
+        cartesian.yAxis(0).title("Number of steps");
+        cartesian.xAxis(0).title("Hours");
+        cartesian.background().fill("#00000000");
+        cartesian.animation().enabled(true);
 
 
         return cartesian;
     }
+
 }

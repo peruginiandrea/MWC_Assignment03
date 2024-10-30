@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -126,6 +127,41 @@ public class StepAppOpenHelper extends SQLiteOpenHelper {
         return map;
     }
 
+    public static Map<String, Integer> loadStepsByDay(Context context, String date){
+        Map<String, Integer> map = new HashMap<>();
+
+        StepAppOpenHelper databaseHelper = new StepAppOpenHelper(context);
+        SQLiteDatabase database = databaseHelper.getReadableDatabase();
+
+        LocalDate endDate = LocalDate.parse(date);
+        LocalDate startDate = endDate.minusDays(6);
+
+        Cursor cursor = database.rawQuery("SELECT day, COUNT(*)  FROM num_steps " +
+                "WHERE day BETWEEN ? AND ? GROUP BY day ORDER BY  day ASC ",
+                new String [] {startDate.toString(), endDate.toString()});
+
+        Log.d("START DATE: ", startDate.toString());
+        Log.d("END DATE: ", endDate.toString());
+        cursor.moveToFirst();
+        Log.d("CURSOR COUNT: ", String.valueOf(cursor.getCount()));
+        Log.d("CURSOR FIRST DAY: ", cursor.getString(0));
+        Log.d("CURSOR FIRST COUNT: ", cursor.getString(1));
+        if (cursor.moveToFirst()) {
+            do {
+                String tmpKey = cursor.getString(0);  // Day as String
+                int tmpValue = cursor.getInt(1);      // Step count as int
+
+                map.put(tmpKey, tmpValue);
+            } while (cursor.moveToNext());
+        }
+
+
+        cursor.close();
+        database.close();
+
+        return map;
+
+    }
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
