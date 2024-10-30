@@ -140,12 +140,7 @@ public class StepAppOpenHelper extends SQLiteOpenHelper {
                 "WHERE day BETWEEN ? AND ? GROUP BY day ORDER BY  day ASC ",
                 new String [] {startDate.toString(), endDate.toString()});
 
-        Log.d("START DATE: ", startDate.toString());
-        Log.d("END DATE: ", endDate.toString());
-        cursor.moveToFirst();
-        Log.d("CURSOR COUNT: ", String.valueOf(cursor.getCount()));
-        Log.d("CURSOR FIRST DAY: ", cursor.getString(0));
-        Log.d("CURSOR FIRST COUNT: ", cursor.getString(1));
+
         if (cursor.moveToFirst()) {
             do {
                 String tmpKey = cursor.getString(0);  // Day as String
